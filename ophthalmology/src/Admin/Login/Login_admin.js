@@ -2,28 +2,46 @@ import React, { useState } from 'react';
 import './Login_admin.css';
 
 const LoginPage = () => {
-  const [identifier, setIdentifier] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle login logic here, such as sending the form data to a server
-    console.log('Identifier:', identifier);
-    console.log('Password:', password);
-    // You can add further validation and submission logic here
+    
+    try {
+      const response = await fetch('http://192.168.1.4:8000/api/adminLogin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to sign in');
+      }
+
+      console.log('Admin signed in successfully!');
+      // Handle success, such as redirecting to another page or showing a success message
+    } catch (error) {
+      console.error('Error signing in:', error.message);
+      setError('Failed to sign in. Please try again.');
+      // Handle error, such as displaying an error message to the user
+    }
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>Admin Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="identifier">Email or Username:</label>
+          <label htmlFor="username">Username:</label>
           <input
             type="text"
-            id="identifier"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
@@ -38,7 +56,11 @@ const LoginPage = () => {
           />
         </div>
         <button type="submit">Login</button>
+        {error && <p className="error-message">{error}</p>}
       </form>
+      <div className="signup-link">
+        Not an admin yet? <a href="/signup">Sign up</a>
+      </div>
     </div>
   );
 };
