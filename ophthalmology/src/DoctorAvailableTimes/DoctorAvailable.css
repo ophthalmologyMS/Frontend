@@ -1,0 +1,30 @@
+/* src/components/Schedule.css */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px;
+  }
+  
+  .time-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.9em;
+  }
+  
+  .time-slot.available {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .time-slot.unavailable {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
