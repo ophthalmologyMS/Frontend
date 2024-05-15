@@ -8,41 +8,41 @@ import logo from './eyes_legs_hands_freak_emoji_icon_149309.ico'
 import AppointmentModal from '../../BookAppointment/AppointmentModal';
 import Schedule from '../../ListViewForAppointements/Schedule';
 import UserModal from '../../Profile/UserModal';
-import {useParams} from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { Link } from 'react-router-dom';
 
-export default function Main(){
+export default function Main() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const {username} = useParams();
-    const {type} = useParams()
+    const { username } = useParams();
+    const { type } = useParams()
     const [role, setRole] = useState(username)
     const [showModal, setShowModal] = useState(false);
     const [user, setUser] = useState()
-  async function getUser(){
-    if(type == "patient"){
-        const promise = await axios(`http://localhost:8000/api/patientInfo/${username}`)
-        return promise.data.patient
-    }else if(type == "doctor"){
-        const promise = await axios(`http://localhost:8000/api/doctorstInfo/${username}`)
-        return promise.data.patient
-    }
-}
-
-  React.useEffect(()=>{
-    async function getInfo(){
-        const data = await getUser()
-        if(data){
-            console.log(data)
-            setUser(data)
+    async function getUser() {
+        if (type == "patient") {
+            const promise = await axios(`http://localhost:8000/api/patientInfo/${username}`)
+            return promise.data.patient
+        } else if (type == "doctor") {
+            const promise = await axios(`http://localhost:8000/api/doctorstInfo/${username}`)
+            return promise.data.patient
         }
     }
 
-    getInfo()
-  },[])
+    React.useEffect(() => {
+        async function getInfo() {
+            const data = await getUser()
+            if (data) {
+                console.log(data)
+                setUser(data)
+            }
+        }
 
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
+        getInfo()
+    }, [])
+
+    const toggleModal = () => {
+        setShowModal(!showModal);
+    };
     const openModal = () => {
         setModalIsOpen(true);
     };
@@ -68,8 +68,8 @@ export default function Main(){
     //     getRole()
     // },[])
 
-    return(
-       <div className="container  ">
+    return (
+        <div className="container  ">
             <div className="row mt-5">
                 <h1 className={`${classes.Headline}`}>We cover everything from this <img src={logo} alt="" width="90" height="90" class="d-inline-block align-text-top" /> to this <img src={logo} alt="" width="90" height="90" class="d-inline-block align-text-top" /> .</h1>
             </div>
@@ -80,24 +80,31 @@ export default function Main(){
                     </div>
                     <div className={` mt-3 col-2 ${classes.Translate}`}>
                         <Link to={'/Records'}>
-                             <button className={`w-100 ${classes.MainButton} `}>Your Records</button>
+                            <button className={`w-100 ${classes.MainButton} `}>Your Records</button>
                         </Link>
                     </div>
                     <div className={` mt-3 col-2 ${classes.Translate}`}>
-                        <button className={` w-100 ${classes.MainButton} `} >{type == "doctor" ? (<Schedule></Schedule>):
-                        (<>{type == "patient" ? (<>Your Appointments</>):
-                        
-                        (<>{type == "admin" ? (<>All your appointments</>):(<></>)}</>)}</>)
-                        
+                        <button className={` w-100 ${classes.MainButton} `} >{type == "doctor" ? (<Schedule></Schedule>) :
+                            (<>{type == "patient" ? (<>Your Appointments</>) :
+
+                                (<>{type == "admin" ? (<>All your appointments</>) : (<></>)}</>)}</>)
+
                         }</button>
                     </div>
                     <div className={`mt-3 col-2 ${classes.Translate}`}>
                         <button className={`w-100 ${classes.MainButton} `} onClick={openModal}>Book an Appointments</button>
                     </div>
+                    {type === "admin" &&
+                        <div className={`mt-3 col-2 ${classes.Translate}`}>
+                            <Link to={'/signup_selector'}>
+                            <button className={`w-100 ${classes.MainButton}`}>Sign Up</button>
+                            </Link>
+                        </div>
+                    }
                 </div>
             </div>
             {showModal && <UserModal user={user} onClose={toggleModal} />}
             <AppointmentModal isOpen={modalIsOpen} onRequestClose={closeModal} />
-       </div>
+        </div>
     )
 }

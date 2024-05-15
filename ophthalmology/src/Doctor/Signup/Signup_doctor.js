@@ -2,37 +2,48 @@ import React, { useState } from 'react';
 import './Signup_doctor.css';
 
 const SignupPage = () => {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [doctorName, setDoctorName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [gender, setGender] = useState('');
   const [fees, setFees] = useState('');
-  const [Speciality, setSpeciality] = useState('');
+  const [speciality, setSpeciality] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     
     try {
-      const response = await fetch('http://192.168.1.4:8000/api/doctorSignUp', {
+      const response = await fetch('http://localhost:8000/api/doctorSignUp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password, phone, gender, fees, Speciality }),
+        body: JSON.stringify({
+          username,
+          doctorName,
+          email,
+          password,
+          phone,
+          gender,
+          fees,
+          speciality
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to sign in');
+        throw new Error('Failed to sign up');
       }
 
       console.log('Doctor signed up successfully!');
-      // Handle success, such as redirecting to another page or showing a success message
+      setSuccessMessage('Signed up successfully!');
     } catch (error) {
       console.error('Error signing up:', error.message);
       setError('Failed to sign up. Please try again.');
-      // Handle error, such as displaying an error message to the user
+      setSuccessMessage('');
     }
   };
 
@@ -42,17 +53,27 @@ const SignupPage = () => {
       <h2>Doctor Sign Up</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="name">Name:</label>
+          <label id='label' htmlFor="username">Username:</label>
           <input
             type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email:</label>
+          <label id='label' htmlFor="doctorName">Doctor Name:</label>
+          <input
+            type="text"
+            id="doctorName"
+            value={doctorName}
+            onChange={(e) => setDoctorName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label id='label' htmlFor="email">Email:</label>
           <input
             type="email"
             id="email"
@@ -62,7 +83,7 @@ const SignupPage = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password:</label>
+          <label id='label' htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
@@ -72,7 +93,7 @@ const SignupPage = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="phone">Phone:</label>
+          <label id='label' htmlFor="phone">Phone:</label>
           <input
             type="text"
             id="phone"
@@ -82,9 +103,9 @@ const SignupPage = () => {
           />
         </div>
         <div className="form-group">
-          <label>Gender:</label>
+          <label id='label'>Gender:</label>
           <div>
-            <label htmlFor="M">
+            <label id='label' htmlFor="M">
               <input
                 type="radio"
                 id="M"
@@ -96,7 +117,7 @@ const SignupPage = () => {
               />
               Male
             </label>
-            <label htmlFor="F">
+            <label id='label' htmlFor="F">
               <input
                 type="radio"
                 id="F"
@@ -111,7 +132,7 @@ const SignupPage = () => {
           </div>
         </div>
         <div className="form-group">
-          <label htmlFor="fees">Fees:</label>
+          <label id='label' htmlFor="fees">Fees:</label>
           <input
             type="text"
             id="fees"
@@ -121,17 +142,18 @@ const SignupPage = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="Speciality">Speciality:</label>
+          <label id='label' htmlFor="speciality">Speciality:</label>
           <input
             type="text"
-            id="Speciality"
-            value={Speciality}
+            id="speciality"
+            value={speciality}
             onChange={(e) => setSpeciality(e.target.value)}
             required
           />
         </div>
-        <button type="submit">Sign Up</button>
+        <button className='submit-button' type="submit">Sign Up</button>
         {error && <p className="error-message">{error}</p>}
+        {successMessage && <p className="success-message">{successMessage}</p>}
       </form>
     </div>
   );

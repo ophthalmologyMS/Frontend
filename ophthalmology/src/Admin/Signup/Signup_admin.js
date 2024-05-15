@@ -6,34 +6,35 @@ const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     try {
-      const response = await fetch('http://192.168.1.4:8000/api/adminSignup', {
+      const response = await fetch('http://localhost:8000/api/adminSignup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to sign in');
+        throw new Error('Failed to sign up');
       }
 
-      console.log('patient signed in successfully!');
-      // Handle success, such as redirecting to another page or showing a success message
+      console.log('Admin signed up successfully!');
+      setSuccessMessage('Signed up successfully!'); // Set success message
+      setError(''); // Clear any previous error messages
     } catch (error) {
-      console.error('Error signing in:', error.message);
-      setError('Failed to sign in. Please try again.');
-      // Handle error, such as displaying an error message to the user
+      console.error('Error signing up:', error.message);
+      setError('Failed to sign up. Please try again.');
+      setSuccessMessage(''); // Clear success message
     }
   };
 
-
-      return (
+  return (
     <div className="signup-container">
       <h2>Admin Sign Up</h2>
       <form onSubmit={handleSubmit}>
@@ -67,10 +68,10 @@ const SignupPage = () => {
             required
           />
         </div>
-        <button type="submit">Sign Up</button>
+        <button className='submit-button' type="submit">Sign Up</button>
         {error && <p className="error-message">{error}</p>}
+        {successMessage && <p className="success-message">{successMessage}</p>}
       </form>
-      <p>Already an admin? <a href="#">Sign in</a></p>
     </div>
   );
 };
