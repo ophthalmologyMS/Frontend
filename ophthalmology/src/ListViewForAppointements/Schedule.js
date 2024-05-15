@@ -135,7 +135,7 @@ const Schedule = () => {
 
   return (
     <div>
-      <button onClick={() => setModalIsOpen(true)}>Open Schedule</button>
+      <a onClick={() => setModalIsOpen(true)} >Open Schedule</a>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}

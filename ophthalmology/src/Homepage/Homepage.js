@@ -8,7 +8,7 @@ import Main from "./Components/Main";
 
 export default function Homepage(){
     return(
-        <div className={`container-fluid vh-100  ${classes.Home}`}>
+        <div className={`container-fluid  vh-100  ${classes.Home}`}>
                 <NavBar />
                 <Main />
         </div>
