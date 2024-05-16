@@ -20,11 +20,11 @@ export default function Main(){
     const [user, setUser] = useState()
   async function getUser(){
     if(type == "patient"){
-        const promise = await axios(`http://localhost:8000/api/patientInfo/${username}`)
+        const promise = await axios.get(`http://localhost:8000/api/patientInfo/${username}`)
         return promise.data.patient
     }else if(type == "doctor"){
-        const promise = await axios(`http://localhost:8000/api/doctorstInfo/${username}`)
-        return promise.data.patient
+        const promise = await axios.get(`http://localhost:8000/api/doctorsInfo/${username}`)
+        return promise.data
     }
 }
 
