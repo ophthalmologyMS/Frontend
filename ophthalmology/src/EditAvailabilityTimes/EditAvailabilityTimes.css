@@ -1,0 +1,19 @@
+.editing-available-time button {
+    width: auto; 
+    height: 25px;
+    padding: 0 10px; 
+    background-color: #0045AC;
+    border-radius: 25px;
+    color: white; 
+    display:inline; 
+    /* justify-content: center; 
+    align-items: center;  */
+    font-size: 15px;
+    border: none;
+    margin-left: 5px;
+    
+}
+.editing-available-time{
+    max-height: 110px;
+    height: 100%;
+}
