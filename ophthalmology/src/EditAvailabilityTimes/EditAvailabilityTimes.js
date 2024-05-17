@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Modal from "react-modal";
 import { IoCloseCircleOutline } from "react-icons/io5";
@@ -8,10 +8,11 @@ import "./EditAvailabilityTimes.css";
 
 Modal.setAppElement("#root");
 
-const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
+const EditAvailabilityTimes = ({ onClose, Events, onEventsChange, doctors }) => {
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const { username } = useParams();
+  const [selectedDr, setSelectedDr] = useState("");
+  const { username, type } = useParams();
 
   // Helper function to get the index of the selected day
   const getDayIndex = (day) => {
@@ -45,30 +46,34 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
     setSelectedTime(e.target.value);
   };
 
+  const handleDrChange = (e) => {
+    setSelectedDr(e.target.value);
+  };
+
   const handleSubmit = async () => {
     if (!selectedDay || !selectedTime) {
       toast.error("Day / time slot not selected!");
       return;
     }
 
-    const newEventTitle = `Dr. ${username} Available`;
-  
+    const newEventTitle = `Dr. ${selectedDr || username} Available`;
+
     const dayIndex = getDayIndex(selectedDay);
     const startHour = selectedTime === 'Morning' ? 9 : (selectedTime === 'Afternoon' ? 12 : 17);
     const timeSlot = getTimeSlot(startHour);
-  
+
     const eventExists = Events.some(event =>
       event.start.toLocaleString('en-US', { weekday: 'long' }) === selectedDay &&
       getTimeSlot(event.start.getHours()) === timeSlot
     );
-  
+
     if (!eventExists) {
       const body = {
-        name: username,
+        name: selectedDr || username,
         days: [...Events.map(event => event.start.toLocaleString('en-US', { weekday: 'long' })), selectedDay],
         time: [...Events.map(event => getTimeSlot(event.start.getHours())), timeSlot],
       };
-  
+
       try {
         const response = await fetch("http://localhost:8000/api/editAvailability", {
           method: "POST",
@@ -77,7 +82,7 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
           },
           body: JSON.stringify(body),
         });
-  
+
         if (!response.ok) {
           throw new Error("Failed to submit data");
         }
@@ -101,22 +106,22 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
     const dayIndex = getDayIndex(selectedDay);
     const startHour = selectedTime === 'Morning' ? 9 : (selectedTime === 'Afternoon' ? 12 : 17);
     const timeSlot = getTimeSlot(startHour);
-  
+
     const eventIndex = Events.findIndex(event =>
       event.start.toLocaleString('en-US', { weekday: 'long' }) === selectedDay &&
       getTimeSlot(event.start.getHours()) === timeSlot
     );
-  
+
     if (eventIndex !== -1) {
       const updatedEvents = [...Events];
       updatedEvents.splice(eventIndex, 1);
-  
+
       const body = {
-        name: username,
+        name: selectedDr || username,
         days: updatedEvents.map(event => event.start.toLocaleString('en-US', { weekday: 'long' })),
         time: updatedEvents.map(event => getTimeSlot(event.start.getHours())),
       };
-  
+
       try {
         const response = await fetch("http://localhost:8000/api/editAvailability", {
           method: "POST",
@@ -125,7 +130,7 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
           },
           body: JSON.stringify(body),
         });
-  
+
         if (!response.ok) {
           throw new Error("Failed to submit data");
         }
@@ -139,8 +144,6 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
     }
     onEventsChange();
   };
-  
-  
 
   return (
     <div>
@@ -159,6 +162,21 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
         }}
       >
         <IoCloseCircleOutline className="close-button" onClick={onClose} />
+        {type === "admin" && (
+          <div className="edit-dr">
+            <label htmlFor="dr-options">Doctor:</label>
+            <select id="dr-options" value={selectedDr} onChange={handleDrChange}>
+              <option value="" disabled>
+                Select a Doctor
+              </option>
+              {doctors.map((doctor) => (
+                <option key={doctor._id} value={doctor.username}>
+                  {doctor.doctorName}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="edit-day">
           <label htmlFor="day-options">Day:</label>
           <select id="day-options" value={selectedDay} onChange={handleDayChange}>
@@ -186,8 +204,8 @@ const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
           </select>
         </div>
         <div className="editing-available-time">
-        <button onClick={handleSubmit}>Add</button>
-        <button onClick={handleRemove}>Remove</button>
+          <button onClick={handleSubmit}>Add</button>
+          <button onClick={handleRemove}>Remove</button>
         </div>
       </Modal>
       <ToastContainer />

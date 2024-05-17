@@ -13,130 +13,142 @@ import "./DoctorAvailable.css";
 const localizer = momentLocalizer(moment);
 Modal.setAppElement("#root");
 
-const Schedule = ({onClose}) => {
+const Schedule = ({ onClose }) => {
   const [events, setEvents] = useState([]);
   const [doctors, setDoctors] = useState([]);
-  const[editModal, setEditModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
   const { username, type } = useParams();
 
   useEffect(() => {
-    // Fetch appointments data
-    fetch("http://localhost:8000/api/appointments")
+    // Fetch all doctors data
+    fetch("http://localhost:8000/api/allDoctors")
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          setDoctors(data.availableTimeSlots);
+          setDoctors(data.data);
         }
       })
       .catch((error) => {
-        console.error("Error fetching appointments:", error);
+        console.error("Error fetching doctors:", error);
       });
   }, []);
 
   useEffect(() => {
-  if (type === "doctor") {
-    const doctor = doctors.find((doc) => doc.doctorName === username);
-    if (doctor && doctor.time && doctor.timeSlots) {
-      const appointments = [];
-      doctor.timeSlots.forEach((day) => {
-        const dayIndex = moment().day(day).day(); // Get the index of the day
-        if (dayIndex !== -1) {
-          // Find the index of the current day in timeSlots array
-          const index = doctor.timeSlots.indexOf(day);
-          // Check if the index is valid and retrieve the corresponding time slot
-          if (index !== -1 && index < doctor.time.length) {
-            const timeSlot = doctor.time[index];
-            let startHour, endHour;
-            switch (timeSlot) {
-              case "Morning":
-                startHour = 9;
-                endHour = 12;
-                break;
-              case "Afternoon":
-                startHour = 12;
-                endHour = 17;
-                break;
-              case "Evening":
-                startHour = 17;
-                endHour = 22;
-                break;
-              default:
-                break;
-            }
-            const startDate = moment().startOf('day').day(dayIndex).hour(startHour).toDate();
-            const endDate = moment().startOf('day').day(dayIndex).hour(endHour).toDate();
-            appointments.push({
-              title: `Dr. ${doctor.doctorName} Available`,
-              start: startDate,
-              end: endDate,
-            });
-          }
-        }
-      });
-      setEvents(appointments);
-    } else {
-      setEvents([]);
-    }
-  }
-}, [username, type, doctors]);
+    const createEvent = (doctorName, day, timeSlot) => {
+      const dayIndex = moment().day(day).day();
+      let startHour, endHour;
+      switch (timeSlot) {
+        case "Morning":
+          startHour = 9;
+          endHour = 12;
+          break;
+        case "Afternoon":
+          startHour = 12;
+          endHour = 17;
+          break;
+        case "Evening":
+          startHour = 17;
+          endHour = 22;
+          break;
+        default:
+          break;
+      }
+      const startDate = moment().startOf('day').day(dayIndex).hour(startHour).toDate();
+      const endDate = moment().startOf('day').day(dayIndex).hour(endHour).toDate();
+      return {
+        title: `Dr. ${doctorName} Available`,
+        start: startDate,
+        end: endDate,
+      };
+    };
 
-const updateEvents = async () => {
-  try {
-    const response = await fetch("http://localhost:8000/api/appointments");
-    const data = await response.json();
-    if (data.success) {
-      const doctor = data.availableTimeSlots.find((doc) => doc.doctorName === username);
-      if (doctor && doctor.time && doctor.timeSlots) {
-        const appointments = [];
-        doctor.timeSlots.forEach((day) => {
-          const dayIndex = moment().day(day).day();
-          if (dayIndex !== -1) {
-            const index = doctor.timeSlots.indexOf(day);
-            if (index !== -1 && index < doctor.time.length) {
-              const timeSlot = doctor.time[index];
-              let startHour, endHour;
-              switch (timeSlot) {
-                case "Morning":
-                  startHour = 9;
-                  endHour = 12;
-                  break;
-                case "Afternoon":
-                  startHour = 12;
-                  endHour = 17;
-                  break;
-                case "Evening":
-                  startHour = 17;
-                  endHour = 22;
-                  break;
-                default:
-                  break;
-              }
-              const startDate = moment().startOf('day').day(dayIndex).hour(startHour).toDate();
-              const endDate = moment().startOf('day').day(dayIndex).hour(endHour).toDate();
-              appointments.push({
-                title: `Dr. ${doctor.doctorName} Available`,
-                start: startDate,
-                end: endDate,
-              });
-            }
-          }
-        });
+    if (type === "doctor") {
+      const doctor = doctors.find((doc) => doc.username === username);
+      if (doctor && doctor.availableDays && doctor.availableTime) {
+        const appointments = doctor.availableDays.map((day, index) =>
+          createEvent(doctor.doctorName, day, doctor.availableTime[index])
+        );
         setEvents(appointments);
       } else {
         setEvents([]);
       }
+    } else {
+      const allAppointments = [];
+      doctors.forEach((doctor) => {
+        if (doctor.availableDays && doctor.availableTime) {
+          doctor.availableDays.forEach((day, index) => {
+            allAppointments.push(createEvent(doctor.doctorName, day, doctor.availableTime[index]));
+          });
+        }
+      });
+      setEvents(allAppointments);
     }
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-  }
-};
+  }, [username, type, doctors]);
 
+  const updateEvents = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/allDoctors");
+      const data = await response.json();
+      if (data.success) {
+        const createEvent = (doctorName, day, timeSlot) => {
+          const dayIndex = moment().day(day).day();
+          let startHour, endHour;
+          switch (timeSlot) {
+            case "Morning":
+              startHour = 9;
+              endHour = 12;
+              break;
+            case "Afternoon":
+              startHour = 12;
+              endHour = 17;
+              break;
+            case "Evening":
+              startHour = 17;
+              endHour = 22;
+              break;
+            default:
+              break;
+          }
+          const startDate = moment().startOf('day').day(dayIndex).hour(startHour).toDate();
+          const endDate = moment().startOf('day').day(dayIndex).hour(endHour).toDate();
+          return {
+            title: `Dr. ${doctorName} Available`,
+            start: startDate,
+            end: endDate,
+          };
+        };
+
+        if (type === "doctor") {
+          const doctor = data.data.find((doc) => doc.username === username);
+          if (doctor && doctor.availableDays && doctor.availableTime) {
+            const appointments = doctor.availableDays.map((day, index) =>
+              createEvent(doctor.doctorName, day, doctor.availableTime[index])
+            );
+            setEvents(appointments);
+          } else {
+            setEvents([]);
+          }
+        } else {
+          const allAppointments = [];
+          data.data.forEach((doctor) => {
+            if (doctor.availableDays && doctor.availableTime) {
+              doctor.availableDays.forEach((day, index) => {
+                allAppointments.push(createEvent(doctor.doctorName, day, doctor.availableTime[index]));
+              });
+            }
+          });
+          setEvents(allAppointments);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
 
   const handleEditModal = () => {
     setEditModal(true);
   }
   const closeEditModal = () => {
-    console.log("close");
     setEditModal(false);
   }
 
@@ -228,7 +240,7 @@ const updateEvents = async () => {
           </button>
         </div>
         <div className="rbc-header-two">
-        {(type === 'doctor' || type === 'admin') && (
+          {(type === 'doctor' || type === 'admin') && (
             <button onClick={handleEditModal}>
               <MdEdit />
               Edit
@@ -289,7 +301,7 @@ const updateEvents = async () => {
         </div>
       </Modal>
 
-      {editModal && events && <EditAvailabilityTimes onClose={closeEditModal} Events={events} onEventsChange={updateEvents} />}
+      {editModal && events && <EditAvailabilityTimes onClose={closeEditModal} Events={events} onEventsChange={updateEvents} doctors={doctors} />}
     </div>
   );
 };
