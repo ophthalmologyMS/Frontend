@@ -80,6 +80,57 @@ const Schedule = ({onClose}) => {
   }
 }, [username, type, doctors]);
 
+const updateEvents = async () => {
+  try {
+    const response = await fetch("http://localhost:8000/api/appointments");
+    const data = await response.json();
+    if (data.success) {
+      const doctor = data.availableTimeSlots.find((doc) => doc.doctorName === username);
+      if (doctor && doctor.time && doctor.timeSlots) {
+        const appointments = [];
+        doctor.timeSlots.forEach((day) => {
+          const dayIndex = moment().day(day).day();
+          if (dayIndex !== -1) {
+            const index = doctor.timeSlots.indexOf(day);
+            if (index !== -1 && index < doctor.time.length) {
+              const timeSlot = doctor.time[index];
+              let startHour, endHour;
+              switch (timeSlot) {
+                case "Morning":
+                  startHour = 9;
+                  endHour = 12;
+                  break;
+                case "Afternoon":
+                  startHour = 12;
+                  endHour = 17;
+                  break;
+                case "Evening":
+                  startHour = 17;
+                  endHour = 22;
+                  break;
+                default:
+                  break;
+              }
+              const startDate = moment().startOf('day').day(dayIndex).hour(startHour).toDate();
+              const endDate = moment().startOf('day').day(dayIndex).hour(endHour).toDate();
+              appointments.push({
+                title: `Dr. ${doctor.doctorName} Available`,
+                start: startDate,
+                end: endDate,
+              });
+            }
+          }
+        });
+        setEvents(appointments);
+      } else {
+        setEvents([]);
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+  }
+};
+
 
   const handleEditModal = () => {
     setEditModal(true);
@@ -238,7 +289,7 @@ const Schedule = ({onClose}) => {
         </div>
       </Modal>
 
-      {editModal && events && <EditAvailabilityTimes onClose={closeEditModal} Events={events}/>}
+      {editModal && events && <EditAvailabilityTimes onClose={closeEditModal} Events={events} onEventsChange={updateEvents} />}
     </div>
   );
 };

@@ -8,7 +8,7 @@ import "./EditAvailabilityTimes.css";
 
 Modal.setAppElement("#root");
 
-const EditAvailabilityTimes = ({ onClose, Events }) => {
+const EditAvailabilityTimes = ({ onClose, Events,onEventsChange }) => {
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const { username } = useParams();
@@ -89,6 +89,7 @@ const EditAvailabilityTimes = ({ onClose, Events }) => {
     } else {
       toast.warning("It is already set available!");
     }
+    onEventsChange();
   };
 
   const handleRemove = async () => {
@@ -136,6 +137,7 @@ const EditAvailabilityTimes = ({ onClose, Events }) => {
     } else {
       toast.warning("This event does not exist!");
     }
+    onEventsChange();
   };
   
   
