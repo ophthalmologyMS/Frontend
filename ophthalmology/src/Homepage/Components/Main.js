@@ -10,6 +10,8 @@ import Schedule from '../../ListViewForAppointements/Schedule';
 import UserModal from '../../Profile/UserModal';
 import {useParams} from "react-router-dom"
 import { Link } from 'react-router-dom';
+import DoctorAvailableTime from '../../DoctorAvailableTimes/DoctorAvailable';
+import EditAvailabilityTimes from '../../EditAvailabilityTimes/EditAvailabilityTimes';
 
 export default function Main(){
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -18,11 +20,13 @@ export default function Main(){
     const [role, setRole] = useState(username)
     const [showModal, setShowModal] = useState(false);
     const [user, setUser] = useState()
+    const[doctorTimeModal,setDoctorTimeModal] = useState(false)
+
   async function getUser(){
-    if(type == "patient"){
+    if(type === "patient"){
         const promise = await axios.get(`http://localhost:8000/api/patientInfo/${username}`)
         return promise.data.patient
-    }else if(type == "doctor"){
+    }else if(type === "doctor"){
         const promise = await axios.get(`http://localhost:8000/api/doctorsInfo/${username}`)
         return promise.data
     }
@@ -32,7 +36,6 @@ export default function Main(){
     async function getInfo(){
         const data = await getUser()
         if(data){
-            console.log(data)
             setUser(data)
         }
     }
@@ -43,8 +46,17 @@ export default function Main(){
   const toggleModal = () => {
     setShowModal(!showModal);
   };
+
+  const closeDoctorTimeModal = () => {  
+    setDoctorTimeModal(false);
+  }
     const openModal = () => {
+        if(type === "doctor"){
+            setDoctorTimeModal(true);
+        }
+        else{
         setModalIsOpen(true);
+        }
     };
 
     const closeModal = () => {
@@ -84,18 +96,19 @@ export default function Main(){
                         </Link>
                     </div>
                     <div className={` mt-3 col-2 ${classes.Translate}`}>
-                        <button className={` w-100 ${classes.MainButton} `} >{type == "doctor" ? (<Schedule></Schedule>):
-                        (<>{type == "patient" ? (<>Your Appointments</>):
+                        <button className={` w-100 ${classes.MainButton} `} >{type === "doctor" ? (<Schedule></Schedule>):
+                        (<>{type === "patient" ? (<>Your Appointments</>):
                         
-                        (<>{type == "admin" ? (<>All your appointments</>):(<></>)}</>)}</>)
+                        (<>{type === "admin" ? (<>All your appointments</>):(<></>)}</>)}</>)
                         
                         }</button>
                     </div>
                     <div className={`mt-3 col-2 ${classes.Translate}`}>
-                        <button className={`w-100 ${classes.MainButton} `} onClick={openModal}>Book an Appointments</button>
+                        <button className={`w-100 ${classes.MainButton} `} onClick={openModal}>{type === "doctor" ? (<>Availability time</>):(<>Book an appointement</>)}</button>
                     </div>
                 </div>
             </div>
+            {doctorTimeModal && <DoctorAvailableTime onClose={closeDoctorTimeModal}/>}
             {showModal && <UserModal user={user} onClose={toggleModal} />}
             <AppointmentModal isOpen={modalIsOpen} onRequestClose={closeModal} />
        </div>
