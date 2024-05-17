@@ -27,4 +27,72 @@
     background-color: #f8d7da;
     color: #721c24;
   }
+
+
+  .close-button{
+    margin-left:auto ;
+    margin-bottom: 10px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+  }
+  
+  .close-button:hover{
+    background-color: rgba(128, 128, 128, 0.3);
+  }
+
+  .rbc-toolbar {
+    /* display: flex; */
+    /* flex-direction: column; */
+  }
+  .rbc-toolbar button{
+    cursor: pointer;
+    border: none;
+  }
+  
+  .rbc-header-one{
+    display: flex;
+  }
+  .rbc-header-one:hover button{
+    background-color: none;
+  }
+  .rbc-header-one,
+  .rbc-header-two {
+    /* display: flex; */
+    /* justify-content: space-between; */
+    /* align-items: center; */
+    margin-bottom: 10px; /* Add some spacing between the lines */
+  }
+  .rbc-header-two{
+    margin-left: auto;
+  }
+  .rbc-header-one-inside {
+    /* display: flex; */
+  }
+  
+  .today-button {
+    margin-right: 0; /* Stick the "Today" button to the right */
+  }
+  .nav-button {
+    position: relative;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  .nav-button:focus {
+    outline: none;
+    background-color: transparent !important;
+  }
+  .nav-button:hover .nav-icon {
+    color: blue;
+  }
+  .nav-button:hover {
+    background-color: transparent !important; 
+  }
+  .nav-button:hover .nav-icon path {
+    stroke:  #FF9950;
+    stroke-width: 2;
+    transition: stroke-width 0.3s ease-in-out;
+  }
   

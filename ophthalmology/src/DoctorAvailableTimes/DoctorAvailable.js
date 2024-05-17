@@ -4,17 +4,20 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useParams } from 'react-router-dom';
 import { MdOutlineToday } from "react-icons/md";
-import "./Schedule.css";
+import { MdEdit } from "react-icons/md";
+import EditAvailabilityTimes from "../EditAvailabilityTimes/EditAvailabilityTimes";
+import "./DoctorAvailable.css";
 
 const localizer = momentLocalizer(moment);
 Modal.setAppElement("#root");
 
-const Schedule = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+const Schedule = ({onClose}) => {
   const [events, setEvents] = useState([]);
   const [doctors, setDoctors] = useState([]);
-  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const[editModal, setEditModal] = useState(false);
+  const { username, type } = useParams();
 
   useEffect(() => {
     // Fetch appointments data
@@ -23,7 +26,6 @@ const Schedule = () => {
       .then((data) => {
         if (data.success) {
           setDoctors(data.availableTimeSlots);
-          console.log("understanding : " +JSON.stringify(data));
         }
       })
       .catch((error) => {
@@ -32,53 +34,60 @@ const Schedule = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedDoctor) {
-      // console.log("doctors: " + JSON.stringify(doctors.find((doc) => doc.doctorName === selectedDoctor)));
-        const doctor = doctors.find((doc) => doc.doctorName === selectedDoctor);
-        if (doctor && doctor.time && doctor.timeSlots) {
-            const appointments = [];
-            doctor.timeSlots.forEach((day) => {
-                const dayNumber = moment().day(day).day();
-                doctor.time.forEach((timeSlot) => {
-                    let startHour, endHour;
-                    switch (timeSlot) {
-                        case "Morning":
-                            startHour = 9;
-                            endHour = 12;
-                            break;
-                        case "Afternoon":
-                            startHour = 12;
-                            endHour = 17;
-                            break;
-                        case "Evening":
-                            startHour = 17;
-                            endHour = 22;
-                            break;
-                        default:
-                            break;
-                    }
-                    const startDate = moment().startOf('day').day(dayNumber).add(startHour, 'hours');
-                    const endDate = moment().startOf('day').day(dayNumber).add(endHour, 'hours');
-                    // console.log("timeSlot:", timeSlot);
-                    // console.log("startHour:", startHour);
-                    // console.log("endHour:", endHour);
-                    // console.log("dayNumber:", dayNumber);
-                    // console.log("startDate:", startDate);
-                    // console.log("endDate:", endDate );
-                    appointments.push({
-                      title: `Dr.${doctor.doctorName} Available `,
-                        start: startDate.toDate(),
-                        end: endDate.toDate(),
-                    });
-                });
+  if (type === "doctor") {
+    const doctor = doctors.find((doc) => doc.doctorName === username);
+    if (doctor && doctor.time && doctor.timeSlots) {
+      const appointments = [];
+      doctor.timeSlots.forEach((day) => {
+        const dayIndex = moment().day(day).day(); // Get the index of the day
+        if (dayIndex !== -1) {
+          // Find the index of the current day in timeSlots array
+          const index = doctor.timeSlots.indexOf(day);
+          // Check if the index is valid and retrieve the corresponding time slot
+          if (index !== -1 && index < doctor.time.length) {
+            const timeSlot = doctor.time[index];
+            let startHour, endHour;
+            switch (timeSlot) {
+              case "Morning":
+                startHour = 9;
+                endHour = 12;
+                break;
+              case "Afternoon":
+                startHour = 12;
+                endHour = 17;
+                break;
+              case "Evening":
+                startHour = 17;
+                endHour = 22;
+                break;
+              default:
+                break;
+            }
+            const startDate = moment().startOf('day').day(dayIndex).hour(startHour).toDate();
+            const endDate = moment().startOf('day').day(dayIndex).hour(endHour).toDate();
+            appointments.push({
+              title: `Dr. ${doctor.doctorName} Available`,
+              start: startDate,
+              end: endDate,
             });
-            setEvents(appointments);
-            
-        } else {
-            setEvents([]);
+          }
         }
+      });
+      setEvents(appointments);
+    } else {
+      setEvents([]);
     }
-}, [selectedDoctor, doctors]);
+  }
+}, [username, type, doctors]);
+
+
+  const handleEditModal = () => {
+    setEditModal(true);
+  }
+  const closeEditModal = () => {
+    console.log("close");
+    setEditModal(false);
+  }
 
   const workingHours = {
     start: moment().set({ hour: 7, minute: 0, second: 0 }).toDate(),
@@ -124,7 +133,6 @@ const Schedule = () => {
       toolbar.onNavigate("today", updatedToolbar.date);
     };
 
-
     return (
       <div className="rbc-toolbar">
         <div className="rbc-header-one">
@@ -169,17 +177,12 @@ const Schedule = () => {
           </button>
         </div>
         <div className="rbc-header-two">
-          <select
-            value={selectedDoctor}
-            onChange={(e) => setSelectedDoctor(e.target.value)}
-          >
-            <option value="">Select Doctor</option>
-            {doctors.map((doctor) => (
-              <option key={doctor.doctorName} value={doctor.doctorName}>
-                {doctor.doctorName}
-              </option>
-            ))}
-          </select>
+        {(type === 'doctor' || type === 'admin') && (
+            <button onClick={handleEditModal}>
+              <MdEdit />
+              Edit
+            </button>
+          )}
           <button type="button" onClick={() => toolbar.onView("day")}>
             Day
           </button>
@@ -196,10 +199,8 @@ const Schedule = () => {
 
   return (
     <div>
-      <button onClick={() => setModalIsOpen(true)}>Open DoctorAvailable</button>
       <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
+        isOpen={true}
         contentLabel="Appointment Schedule"
         style={{
           overlay: {
@@ -219,10 +220,7 @@ const Schedule = () => {
       >
         <div className="modal-header">
           <h2>Doctor Available Schedule</h2>
-          <IoCloseCircleOutline
-            className="close-button"
-            onClick={() => setModalIsOpen(false)}
-          />
+          <IoCloseCircleOutline className="close-button" onClick={onClose} />
         </div>
         <div style={{ width: 700, height: 700 }}>
           <Calendar
@@ -239,6 +237,8 @@ const Schedule = () => {
           />
         </div>
       </Modal>
+
+      {editModal && events && <EditAvailabilityTimes onClose={closeEditModal} Events={events}/>}
     </div>
   );
 };
