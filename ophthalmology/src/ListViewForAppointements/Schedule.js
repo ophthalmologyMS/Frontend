@@ -28,10 +28,12 @@ const Schedule = () => {
           let filteredAppointments = data.appointments;
           if (type === 'doctor') {
             filteredAppointments = data.appointments.filter(appointment => appointment.doctorName === username);
+          } else if (type === 'patient') {
+            filteredAppointments = data.appointments.filter(appointment => appointment.patientName === username);
           }
           const formattedEvents = filteredAppointments.map((appointment) => {
             const dayOfWeek = moment().day(appointment.date);
-
+  
             if (!dayOfWeek.isValid()) {
               console.error(`Invalid date format: ${appointment.date}`);
               return null; // Skip invalid dates
@@ -39,7 +41,7 @@ const Schedule = () => {
             
             let startTime;
             let endTime;
-
+  
             if (appointment.time === "Morning") {
               startTime = dayOfWeek.clone().set({ hour: 9, minute: 0, second: 0 }).toDate();
               endTime = dayOfWeek.clone().set({ hour: 12, minute: 0, second: 0 }).toDate();
@@ -53,16 +55,16 @@ const Schedule = () => {
               console.error(`Invalid time of day: ${appointment.time}`);
               return null; // Skip invalid time of day
             }
-
+  
             return {
               id: appointment._id,
-              title: `Dr. ${appointment.doctorName} - ${appointment.patientName}`,
+              title: type === 'doctor' ? `Dr. ${appointment.doctorName} - ${appointment.patientName}` : `Dr. ${appointment.doctorName} - ${appointment.Service}`,
               start: startTime,
               end: endTime,
               reason: appointment.Service,
             };
           }).filter(event => event !== null); // Filter out invalid events
-
+  
           setEvents(formattedEvents);
         } else {
           throw new Error("Failed to fetch appointments");
@@ -73,10 +75,10 @@ const Schedule = () => {
         setLoading(false);
       }
     };
-
+  
     fetchAppointments();
   }, [type, username]);
-
+  
   const workingHours = {
     start: moment().set({ hour: 7, minute: 0, second: 0 }).toDate(),
     end: moment().set({ hour: 23, minute: 59, second: 59 }).toDate(),
