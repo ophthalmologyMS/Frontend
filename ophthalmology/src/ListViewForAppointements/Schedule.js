@@ -6,7 +6,11 @@ import moment from "moment";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { MdOutlineToday } from "react-icons/md";
+import { MdOutlineCancelPresentation } from "react-icons/md";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
 import { ToastContainer, toast } from 'react-toastify';
+import { FaExchangeAlt } from "react-icons/fa";
+import EditAppointment from "./EditAppointment.js";
 import 'react-toastify/dist/ReactToastify.css';
 import "./Schedule.css";
 
@@ -15,6 +19,7 @@ Modal.setAppElement("#root");
 
 const Schedule = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const[editAppointment,setEditAppointment] = useState(false);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,8 +93,8 @@ const Schedule = () => {
                 id: appointment._id,
                 title:
                   type === "doctor"
-                    ? `Dr. ${appointment.doctorName} - ${appointment.patientName}`
-                    : `Dr. ${appointment.doctorName} - ${appointment.Service}`,
+                    ? `Dr. ${appointment.doctorName} - ${appointment.patientName} (${appointment.Service})`
+                    : `Dr. ${appointment.doctorName} - ${appointment.patientName} (${appointment.Service})`,
                 start: startTime,
                 end: endTime,
                 reason: appointment.Service,
@@ -124,6 +129,12 @@ const Schedule = () => {
     if (type === "doctor" || type === "admin") {
       setSelectedEvent(event);
     }
+  };
+  const handleUpdateEvent = (updatedEvent) => {
+    const updatedEvents = events.map(event =>
+      event.id === updatedEvent.id ? updatedEvent : event
+    );
+    setEvents(updatedEvents);
   };
 
   const markAppointmentCanceled = async () => {
@@ -170,6 +181,9 @@ const Schedule = () => {
         );
         const data = await response.json();
         if (data.success) {
+          // Generate bill after marking appointment as done
+          await generateBill(selectedEvent.id);
+  
           const updatedEvents = events.map((event) => {
             if (event.id === selectedEvent.id) {
               return {
@@ -178,7 +192,6 @@ const Schedule = () => {
                 isDone: true, // Update the isDone property
               };
             }
-            toast.success("Appointment marked as done");
             return event;
           });
           setEvents(updatedEvents); // Update the events state
@@ -192,6 +205,27 @@ const Schedule = () => {
       }
     }
   };
+  
+  const generateBill = async (appointmentId) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/bills", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ appointmentID:appointmentId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        console.log("Bill generated successfully");
+      } else {
+        throw new Error("Failed to generate bill");
+      }
+    } catch (error) {
+      console.error("Error generating bill:", error.message);
+    }
+  };
+  
   
 
   const eventStyleGetter = (event, start, end, isSelected) => {
@@ -219,6 +253,13 @@ const Schedule = () => {
     end: moment().set({ hour: 23, minute: 59, second: 59 }).toDate(),
   };
 
+  const handleEditAppointment = () => {
+    setEditAppointment(true);
+  }
+
+  const closeEditAppointmentModal = () => { 
+    setEditAppointment(false);
+  }
   const CustomToolbar = (toolbar) => {
     const goToBack = () => {
       if (toolbar.view === "day") {
@@ -373,12 +414,15 @@ www.w3.org/2000/svg"
         </div>
         {selectedEvent && (type === "doctor" || type === "admin") && (
           <div className="marking-buttons">
-          <button onClick={markAppointmentDone}>Mark as Done</button>
-          <button onClick={markAppointmentCanceled}>Mark as Canceled</button>
+          <button onClick={markAppointmentDone}>Mark as Done <IoCheckmarkDoneSharp /></button>
+          <button onClick={markAppointmentCanceled}>Mark as Canceled <MdOutlineCancelPresentation/></button>
+          <button onClick={handleEditAppointment}>Edit appointment <FaExchangeAlt /></button>
           </div>
         )}
       </Modal>
       <ToastContainer />
+
+      {editAppointment && selectedEvent && <EditAppointment onClose={closeEditAppointmentModal} Events={events} selectedEvent={selectedEvent} onUpdateEvent={handleUpdateEvent} />}
     </div>
   );
 };
