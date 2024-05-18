@@ -42,6 +42,7 @@ align-items: center;
 .rbc-toolbar {
   /* display: flex; */
   /* flex-direction: column; */
+  margin-top: 15px;
 }
 .rbc-toolbar button{
   cursor: pointer;
@@ -92,4 +93,21 @@ align-items: center;
   stroke-width: 2;
   transition: stroke-width 0.3s ease-in-out;
 }
+
+.marking-buttons button{
+  width: auto; 
+    height: 25px;
+    padding: 0 10px; 
+    background-color: #072A6C;  
+    border-radius: 25px;
+    color: white; 
+    display:inline; 
+    /* justify-content: center; 
+    align-items: center;  */
+    font-size: 15px;
+    border: none;
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
 
