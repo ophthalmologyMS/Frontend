@@ -1,10 +1,12 @@
 /* CreateAccountModal.css */
 .Modal {
-    background: white;
+    background: rgb(255, 255, 255);
     padding: 20px;
     border-radius: 10px;
     width: 400px; /* Adjust the width as needed */
     margin: auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
 }
 
 h2 {

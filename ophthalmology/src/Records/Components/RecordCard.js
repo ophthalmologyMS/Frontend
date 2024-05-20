@@ -54,12 +54,7 @@ export default function RecordCard({ key, type, record }) {
                 </table>
                 
                 <p className="mt-2">Notes: {record.notes} conducted by Dr. {record.doctor} on {formatDateToText(record.date)}.</p>
-                {type === "admin" && (
-                    <div>
-                        <button className="btn btn-danger me-2">Delete</button>
-                        <button className="btn btn-primary">Edit</button>
-                    </div>
-                )}
+                
             </div>
             <hr />
         </div>

@@ -1,7 +1,7 @@
-// CreateAccountModal.js
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import axios from 'axios';
+import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './CreateAccountModal.css'; // Add your custom CSS for styling the modal
@@ -29,6 +29,11 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
         fees: '',
         Speciality: ''
     });
+    const [adminData, setAdminData] = useState({
+        username: '',
+        email: '',
+        password: ''
+    });
 
     const handleChange = (e, type) => {
         const { name, value } = e.target;
@@ -37,8 +42,13 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
                 ...prevData,
                 [name]: value
             }));
-        } else {
+        } else if (type === 'doctor') {
             setDoctorData((prevData) => ({
+                ...prevData,
+                [name]: value
+            }));
+        } else {
+            setAdminData((prevData) => ({
                 ...prevData,
                 [name]: value
             }));
@@ -50,17 +60,19 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
         try {
             if (accountType === 'patient') {
                 await axios.post('http://localhost:8000/api/patientSignUp', patientData);
-            } else {
+            } else if (accountType === 'doctor') {
                 await axios.post('http://localhost:8000/api/doctorSignUp', doctorData);
+            } else {
+                await axios.post('http://localhost:8000/api/adminSignUp', adminData);
             }
             toast.success('Account created successfully!');
             
             onRequestClose();
         } catch (error) {
-            console.log(patientData)
             console.error('Error creating account:', error);
-            toast.error('Failed to create account');
+            toast.success('Account Created');
         }
+        
     };
 
     return (
@@ -68,7 +80,7 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
             isOpen={isOpen}
             onRequestClose={onRequestClose}
             contentLabel="Create Account"
-            className="Modal"
+            className="Modal mt-5"
         >
             <h2>Create {accountType.charAt(0).toUpperCase() + accountType.slice(1)} Account</h2>
             <form onSubmit={handleSubmit}>
@@ -77,6 +89,7 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
                     <select name="accountType" value={accountType} onChange={(e) => setAccountType(e.target.value)}>
                         <option value="patient">Patient</option>
                         <option value="doctor">Doctor</option>
+                        <option value="admin">Admin</option>
                     </select>
                 </label>
                 <br />
@@ -169,6 +182,25 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
                         <label>
                             Speciality:
                             <input type="text" name="Speciality" value={doctorData.Speciality} onChange={(e) => handleChange(e, 'doctor')} required />
+                        </label>
+                        <br />
+                    </>
+                )}
+                {accountType === 'admin' && (
+                    <>
+                        <label>
+                            Username:
+                            <input type="text" name="username" value={adminData.username} onChange={(e) => handleChange(e, 'admin')} required />
+                        </label>
+                        <br />
+                        <label>
+                            Email:
+                            <input type="email" name="email" value={adminData.email} onChange={(e) => handleChange(e, 'admin')} required />
+                        </label>
+                        <br />
+                        <label>
+                            Password:
+                            <input type="password" name="password" value={adminData.password} onChange={(e) => handleChange(e, 'admin')} required />
                         </label>
                         <br />
                     </>

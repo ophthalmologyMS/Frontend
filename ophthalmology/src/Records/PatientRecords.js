@@ -98,11 +98,11 @@ export default function PatientRecords() {
                         </option>
                     ))}
                 </select>
-                {type === 'doctor' && (
+                {type === 'doctor' || type === 'admin' ? (
                     <button onClick={() => setIsModalOpen(true)} className={classes.addButton}>
                         Add Record
                     </button>
-                )}
+                ):(<></>)}
             </div>
 
             {Records.map((item) => (

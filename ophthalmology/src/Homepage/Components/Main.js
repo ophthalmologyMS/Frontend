@@ -124,11 +124,11 @@ export default function Main() {
               )}
             </button>
           </div>
-          <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+          {type === 'admin' ? (<></>) :(<div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
             <button className={`w-100 ${classes.MainButton}`} onClick={openModal}>
               {type === "doctor" ? "Availability time" : "Book an appointment"}
             </button>
-          </div>
+          </div>)}
           {(type === "admin" || type === "patient") && (
             <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
               <button className={`w-100 ${classes.MainButton}`} onClick={handleAdminAvailableTime}>

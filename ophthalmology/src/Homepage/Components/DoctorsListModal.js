@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import axios from 'axios';
 import './DoctorsListModal.css';
-
+import "bootstrap/dist/css/bootstrap.min.css";
 const DoctorsListModal = ({ isOpen, onRequestClose }) => {
   const [doctors, setDoctors] = useState([]);
 
@@ -37,7 +37,7 @@ const DoctorsListModal = ({ isOpen, onRequestClose }) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Doctors List"
-      className="DoctorsListModal"
+      className="DoctorsListModal mt-5"
     >
       <h2>Doctors List</h2>
       <ul>
