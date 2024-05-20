@@ -2,7 +2,11 @@
 
 import React from 'react';
 import "./UserModal.css"
+import { useParams } from 'react-router-dom';
+
 const UserModal = ({ user, onClose }) => {
+  const { username, type } = useParams();
+
   return (
     <div className="modal">
       <div className="modal-content">
@@ -12,7 +16,8 @@ const UserModal = ({ user, onClose }) => {
         <p>Email: {user.email}</p>
         <p>Gender: {user.gender}</p>
         <p>Phone: {user.phone}</p>
-        <p>Speciality: {user.Speciality}</p>
+        {type==="Doctor" &&
+        <p>Speciality: {user.Speciality}</p>}
         <button onClick={onClose}>Close</button>
       </div>
     </div>

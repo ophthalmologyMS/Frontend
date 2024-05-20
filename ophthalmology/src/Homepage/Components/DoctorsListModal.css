@@ -39,10 +39,10 @@
     background-color: darkred;
   }
   
-  .close-button {
+  .close-button1 {
     margin-top: 20px;
     border: none;
-    background-color: #007bff;
+    background-color: none;
     color: rgb(0, 0, 0);
     border-radius: 5px;
     cursor: pointer;
@@ -50,6 +50,6 @@
   }
   
   .close-button:hover {
-    background-color: #0056b3;
+    background-color: none;
   }
   

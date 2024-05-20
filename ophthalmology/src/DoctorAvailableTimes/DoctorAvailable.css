@@ -29,16 +29,19 @@
   }
 
 
-  .close-button{
+  .close-button1{
     margin-left:auto ;
     margin-bottom: 10px;
     cursor: pointer;
     width: 30px;
     height: 30px;
     border-radius: 15px;
+    background-color: none !important;
+    color: none !important;
+
   }
   
-  .close-button:hover{
+  .close-button1:hover{
     background-color: rgba(128, 128, 128, 0.3);
   }
 

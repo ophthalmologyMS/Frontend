@@ -121,8 +121,104 @@ const Schedule = () => {
       }
     };
 
+
+
     fetchAppointments();
-  }, [type, username]);
+  }, [type, username,editAppointment]);
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/allAppointments"
+      );
+      const data = await response.json();
+      if (data.success) {
+        let filteredAppointments = data.appointments;
+        if (type === "doctor") {
+          filteredAppointments = data.appointments.filter(
+            (appointment) => appointment.doctorName === username
+          );
+        } else if (type === "patient") {
+          filteredAppointments = data.appointments.filter(
+            (appointment) => appointment.patientName === username
+          );
+        }
+        const formattedEvents = filteredAppointments
+          .map((appointment) => {
+            const dayOfWeek = moment().day(appointment.date);
+
+            if (!dayOfWeek.isValid()) {
+              console.error(`Invalid date format: ${appointment.date}`);
+              return null; // Skip invalid dates
+            }
+
+            let startTime;
+            let endTime;
+
+            if (appointment.time === "Morning") {
+              startTime = dayOfWeek
+                .clone()
+                .set({ hour: 9, minute: 0, second: 0 })
+                .toDate();
+              endTime = dayOfWeek
+                .clone()
+                .set({ hour: 12, minute: 0, second: 0 })
+                .toDate();
+            } else if (appointment.time === "Afternoon") {
+              startTime = dayOfWeek
+                .clone()
+                .set({ hour: 12, minute: 0, second: 0 })
+                .toDate();
+              endTime = dayOfWeek
+                .clone()
+                .set({ hour: 17, minute: 0, second: 0 })
+                .toDate();
+            } else if (appointment.time === "Evening") {
+              startTime = dayOfWeek
+                .clone()
+                .set({ hour: 17, minute: 0, second: 0 })
+                .toDate();
+              endTime = dayOfWeek
+                .clone()
+                .set({ hour: 22, minute: 0, second: 0 })
+                .toDate();
+            } else {
+              console.error(`Invalid time of day: ${appointment.time}`);
+              return null; // Skip invalid time of day
+            }
+
+            return {
+              id: appointment._id,
+              title:
+                type === "doctor"
+                  ? `Dr. ${appointment.doctorName} - ${appointment.patientName} (${appointment.Service})`
+                  : `Dr. ${appointment.doctorName} - ${appointment.patientName} (${appointment.Service})`,
+              start: startTime,
+              end: endTime,
+              reason: appointment.Service,
+              isDone: appointment.isDone || false, // Initialize isDone property
+            };
+          })
+          .filter((event) => event !== null); // Filter out invalid events
+          console.log("Formatted events:", formattedEvents);
+
+        // Initialize the color property for each event in the state
+        const formattedEventsWithColor = formattedEvents.map((event) => ({
+          ...event,
+          color: event.isDone ? "green" : "blue", // Set color based on the isDone property
+        }));
+
+        setEvents(formattedEventsWithColor);
+        console.log("Formatted events with color:", formattedEventsWithColor);
+      } else {
+        throw new Error("Failed to fetch appointments");
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectEvent = (event) => {
     console.log("Selected event : ", event);
@@ -253,8 +349,10 @@ const Schedule = () => {
     end: moment().set({ hour: 23, minute: 59, second: 59 }).toDate(),
   };
 
-  const handleEditAppointment = () => {
+  const handleEditAppointment = async () => {
     setEditAppointment(true);
+    console.log(55)
+    await fetchAppointments();
   }
 
   const closeEditAppointmentModal = () => { 
@@ -376,7 +474,7 @@ www.w3.org/2000/svg"
         }}
       >
         <div>
-        <button
+        <a
           onClick={() => setModalIsOpen(false)}
           style={{
             background: "none",
@@ -387,7 +485,7 @@ www.w3.org/2000/svg"
           }}
         >
           <IoCloseCircleOutline className="close-button" />
-        </button>
+        </a>
         </div>
         <div style={{ height: "95%", width: "100%" }}>
           {loading ? (

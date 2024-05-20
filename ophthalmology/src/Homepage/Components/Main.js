@@ -1,3 +1,4 @@
+// Main.js
 import React, { useState, useEffect } from 'react';
 import classes from "./Main.module.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -12,6 +13,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import DoctorAvailableTime from "../../DoctorAvailableTimes/DoctorAvailable";
 import CreateAccountModal from './CreateAccountModal'; // Import the CreateAccountModal component
 import DoctorsListModal from './DoctorsListModal'; // Import the DoctorsListModal component
+import BillsModal from './BillsModal'; // Import the BillsModal component
 
 export default function Main() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -24,6 +26,7 @@ export default function Main() {
   const [adminAvailableTime, setAdminAvailableTime] = useState(false);
   const [createAccountModalIsOpen, setCreateAccountModalIsOpen] = useState(false); // State to control CreateAccountModal visibility
   const [doctorsListModalIsOpen, setDoctorsListModalIsOpen] = useState(false); // State to control DoctorsListModal visibility
+  const [billsModalIsOpen, setBillsModalIsOpen] = useState(false); // State to control BillsModal visibility
 
   async function getUser() {
     if (type === "patient") {
@@ -78,8 +81,16 @@ export default function Main() {
     navigate(`/Records/${username}/${type}`)
   }
 
+  const openBillsModal = () => {
+    setBillsModalIsOpen(true);
+  };
+
+  const closeBillsModal = () => {
+    setBillsModalIsOpen(false);
+  };
+
   return (
-    <div className="container  ">
+    <div className="container">
       <div className="row mt-5">
         <h1 className={`${classes.Headline}`}>
           We cover everything from this{" "}
@@ -150,6 +161,13 @@ export default function Main() {
               </button>
             </div>
           )}
+          {type === "patient" && (
+            <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+              <button className={`w-100 ${classes.MainButton}`} onClick={openBillsModal}>
+                Your bills
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {adminAvailableTime && <DoctorAvailableTime onClose={closeAdminAvailableTime} />}
@@ -158,6 +176,7 @@ export default function Main() {
       <AppointmentModal isOpen={modalIsOpen} onRequestClose={closeModal} />
       <CreateAccountModal isOpen={createAccountModalIsOpen} onRequestClose={() => setCreateAccountModalIsOpen(false)} />
       <DoctorsListModal isOpen={doctorsListModalIsOpen} onRequestClose={() => setDoctorsListModalIsOpen(false)} />
+      <BillsModal isOpen={billsModalIsOpen} onRequestClose={closeBillsModal} username={username} />
     </div>
   );
 }

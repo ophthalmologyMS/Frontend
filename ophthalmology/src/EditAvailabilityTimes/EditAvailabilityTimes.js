@@ -161,7 +161,7 @@ const EditAvailabilityTimes = ({ onClose, Events, onEventsChange, doctors }) => 
           },
         }}
       >
-        <IoCloseCircleOutline className="close-button" onClick={onClose} />
+        <IoCloseCircleOutline className="close-button2" onClick={onClose} />
         {type === "admin" && (
           <div className="edit-dr">
             <label htmlFor="dr-options">Doctor:</label>

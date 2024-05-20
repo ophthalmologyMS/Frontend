@@ -283,7 +283,7 @@ const Schedule = ({ onClose }) => {
       >
         <div className="modal-header">
           <h2>Doctor Available Schedule</h2>
-          <IoCloseCircleOutline className="close-button" onClick={onClose} />
+          <IoCloseCircleOutline className="close-button1" onClick={onClose} style={{backgroundColor:'none'}} />
         </div>
         <div style={{ width: 700, height: 700 }}>
           <Calendar

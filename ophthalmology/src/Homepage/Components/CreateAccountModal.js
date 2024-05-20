@@ -70,7 +70,7 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
             onRequestClose();
         } catch (error) {
             console.error('Error creating account:', error);
-            toast.success('Account Created');
+            toast.error('Error creating account');
         }
         
     };
@@ -205,7 +205,9 @@ const CreateAccountModal = ({ isOpen, onRequestClose }) => {
                         <br />
                     </>
                 )}
-                <button type="submit">Create Account</button>
+                <div className='create-account-button'>
+                <button className="create-account-submit"type="submit">Create Account</button>
+                </div>
             </form>
         </Modal>
     );
