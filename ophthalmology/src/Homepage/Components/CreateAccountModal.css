@@ -1,0 +1,29 @@
+/* CreateAccountModal.css */
+.Modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px; /* Adjust the width as needed */
+    margin: auto;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+}
+
+input, select {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}

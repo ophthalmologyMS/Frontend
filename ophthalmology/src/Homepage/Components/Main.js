@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import classes from "./Main.module.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "jquery/dist/jquery.min.js";
@@ -8,36 +8,34 @@ import logo from "./eyes_legs_hands_freak_emoji_icon_149309.ico";
 import AppointmentModal from "../../BookAppointment/AppointmentModal";
 import Schedule from "../../ListViewForAppointements/Schedule";
 import UserModal from "../../Profile/UserModal";
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useParams, useNavigate } from 'react-router-dom';
 import DoctorAvailableTime from "../../DoctorAvailableTimes/DoctorAvailable";
-import EditAvailabilityTimes from "../../EditAvailabilityTimes/EditAvailabilityTimes";
+import CreateAccountModal from './CreateAccountModal'; // Import the CreateAccountModal component
+import DoctorsListModal from './DoctorsListModal'; // Import the DoctorsListModal component
 
 export default function Main() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const { username } = useParams();
-  const { type } = useParams();
+  const { username, type } = useParams();
+  const navigate = useNavigate();
   const [role, setRole] = useState(username);
   const [showModal, setShowModal] = useState(false);
   const [user, setUser] = useState();
   const [doctorTimeModal, setDoctorTimeModal] = useState(false);
-  const[adminAvailableTime, setAdminAvailableTime] = useState(false)
+  const [adminAvailableTime, setAdminAvailableTime] = useState(false);
+  const [createAccountModalIsOpen, setCreateAccountModalIsOpen] = useState(false); // State to control CreateAccountModal visibility
+  const [doctorsListModalIsOpen, setDoctorsListModalIsOpen] = useState(false); // State to control DoctorsListModal visibility
 
   async function getUser() {
     if (type === "patient") {
-      const promise = await axios.get(
-        `http://localhost:8000/api/patientInfo/${username}`
-      );
+      const promise = await axios.get(`http://localhost:8000/api/patientInfo/${username}`);
       return promise.data.patient;
     } else if (type === "doctor") {
-      const promise = await axios.get(
-        `http://localhost:8000/api/doctorsInfo/${username}`
-      );
+      const promise = await axios.get(`http://localhost:8000/api/doctorsInfo/${username}`);
       return promise.data;
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function getInfo() {
       const data = await getUser();
       if (data) {
@@ -51,9 +49,11 @@ export default function Main() {
   const handleAdminAvailableTime = () => {
     setAdminAvailableTime(true);
   }
+  
   const closeAdminAvailableTime = () => {
     setAdminAvailableTime(false);
   }
+  
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -61,6 +61,7 @@ export default function Main() {
   const closeDoctorTimeModal = () => {
     setDoctorTimeModal(false);
   };
+
   const openModal = () => {
     if (type === "doctor") {
       setDoctorTimeModal(true);
@@ -73,22 +74,9 @@ export default function Main() {
     setModalIsOpen(false);
   };
 
-  // async function userRole(){
-  //     console.log(username)
-  //     const promise = await axios.get('http://localhost:8000/api/checkUsername',{name:username})
-  //     return promise.data
-  // }
-
-  // React.useEffect(()=>{
-  //     async function getRole(){
-  //         const data = await userRole()
-  //         if(data){
-  //             setRole(data.message)
-  //         }
-  //     }
-
-  //     getRole()
-  // },[])
+  const handleRecord = () => {
+    navigate(`/Records/${username}/${type}`)
+  }
 
   return (
     <div className="container  ">
@@ -100,7 +88,7 @@ export default function Main() {
             alt=""
             width="90"
             height="90"
-            class="d-inline-block align-text-top"
+            className="d-inline-block align-text-top"
           />{" "}
           to this{" "}
           <img
@@ -108,70 +96,68 @@ export default function Main() {
             alt=""
             width="90"
             height="90"
-            class="d-inline-block align-text-top"
+            className="d-inline-block align-text-top"
           />{" "}
           .
         </h1>
       </div>
       <div className="row mt-5">
         <div className="col-12 d-flex mt-5 align-items-bottom justify-content-around">
-          <div className={` col-2 mt-3 ${classes.Translate}`}>
-            <button
-              className={` w-100 ${classes.MainButton} `}
-              onClick={toggleModal}
-            >
-              Your info
+          {type !== "admin" && (
+            <div className={`col-2 mt-3 ${classes.Translate}`}>
+              <button className={`w-100 ${classes.MainButton}`} onClick={toggleModal}>
+                Your info
+              </button>
+            </div>
+          )}
+          <div className={`mt-3 col-2 ${classes.Translate}`}>
+            <button className={`w-100 ${classes.MainButton}`} onClick={handleRecord}>
+              Your Records
             </button>
           </div>
-          <div className={` mt-3 col-2 ${classes.Translate}`}>
-            <Link to={"/Records"}>
-              <button className={`w-100 ${classes.MainButton} `}>
-                Your Records
-              </button>
-            </Link>
-          </div>
-          <div className={` mt-3 col-2 ${classes.Translate}`}>
-            <button className={` w-100 ${classes.MainButton} `}>
+          <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+            <button className={`w-100 ${classes.MainButton}`}>
               {type === "doctor" || type === "admin" ? (
                 <Schedule></Schedule>
               ) : (
-                <>
-                  {type === "patient" ? (
-                    <><Schedule></Schedule></>
-                  ) : (
-                    <>{type === "admin" ? <>All your appointments</> : <></>}</>
-                  )}
-                </>
+                <Schedule></Schedule>
               )}
             </button>
           </div>
-          <div className={`mt-3 col-2 ${classes.Translate}`}>
-            <button
-              className={`w-100 ${classes.MainButton} `}
-              onClick={openModal}
-            >
-              {type === "doctor" ? (
-                <>Availability time</>
-              ) : (
-                <>Book an appointement</>
-              )}
+          <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+            <button className={`w-100 ${classes.MainButton}`} onClick={openModal}>
+              {type === "doctor" ? "Availability time" : "Book an appointment"}
             </button>
           </div>
-          {(type === "admin" || type==="patient") && (
-            <div className={`mt-3 col-1 ${classes.Translate}`}>
-              <button className={`w-100 ${classes.MainButton} `} onClick={handleAdminAvailableTime}>
+          {(type === "admin" || type === "patient") && (
+            <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+              <button className={`w-100 ${classes.MainButton}`} onClick={handleAdminAvailableTime}>
                 Availability time
+              </button>
+            </div>
+          )}
+          {type === "admin" && (
+            <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+              <button className={`w-100 ${classes.MainButton}`} onClick={() => setCreateAccountModalIsOpen(true)}>
+                Create Account
+              </button>
+            </div>
+          )}
+          {type === "admin" && (
+            <div className={`mt-3 col-2 ms-3 ${classes.Translate}`}>
+              <button className={`w-100 ${classes.MainButton}`} onClick={() => setDoctorsListModalIsOpen(true)}>
+                View Doctors
               </button>
             </div>
           )}
         </div>
       </div>
-      {adminAvailableTime && (<DoctorAvailableTime onClose={closeAdminAvailableTime} />)}
-      {doctorTimeModal && (
-        <DoctorAvailableTime onClose={closeDoctorTimeModal} />
-      )}
+      {adminAvailableTime && <DoctorAvailableTime onClose={closeAdminAvailableTime} />}
+      {doctorTimeModal && <DoctorAvailableTime onClose={closeDoctorTimeModal} />}
       {showModal && <UserModal user={user} onClose={toggleModal} />}
       <AppointmentModal isOpen={modalIsOpen} onRequestClose={closeModal} />
+      <CreateAccountModal isOpen={createAccountModalIsOpen} onRequestClose={() => setCreateAccountModalIsOpen(false)} />
+      <DoctorsListModal isOpen={doctorsListModalIsOpen} onRequestClose={() => setDoctorsListModalIsOpen(false)} />
     </div>
   );
 }

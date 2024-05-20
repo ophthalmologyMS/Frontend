@@ -1,0 +1,44 @@
+/* AddRecordModal.css */
+
+.Modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 1000px;
+    overflow-y: scroll;
+    max-height: 70vh;
+    margin: auto;
+}
+
+.Overlay {
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+}
+
+input, textarea, select {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}

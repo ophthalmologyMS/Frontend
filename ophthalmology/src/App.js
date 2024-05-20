@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route index element={<Intro></Intro>}></Route>
         <Route path="/Home/:username/:type" element={<Homepage></Homepage>}></Route>
-        <Route path ="/Records" element={<PatientRecords></PatientRecords>}  />
+        <Route path="/Records/:username/:type" element={<PatientRecords></PatientRecords>}  />
       </Routes>
     </BrowserRouter>
   );

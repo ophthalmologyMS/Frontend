@@ -4,9 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'jquery/dist/jquery.min.js'
 import 'bootstrap/dist/js/bootstrap.min.js'
 
-export default function RecordCard({ record }) {
+export default function RecordCard({ key, type, record }) {
     const [rightEye, setRightEye] = React.useState();
-    
+
     function formatDateToText(isoDate) {
         const date = new Date(isoDate);
         const day = date.getDate();
@@ -21,8 +21,6 @@ export default function RecordCard({ record }) {
 
         setEyes();
     }, []);
-
-
 
     return (
         <div className="container mt-5">
@@ -46,7 +44,7 @@ export default function RecordCard({ record }) {
                             <td>{record.RT.reading}</td>
                         </tr>
                         <tr>
-                            <td>Left Eye (RT)</td>
+                            <td>Left Eye (LT)</td>
                             <td>{record.LT.SPH}</td>
                             <td>{record.LT.cyl}</td>
                             <td>{record.LT.axis}</td>
@@ -54,7 +52,14 @@ export default function RecordCard({ record }) {
                         </tr>
                     </tbody>
                 </table>
+                
                 <p className="mt-2">Notes: {record.notes} conducted by Dr. {record.doctor} on {formatDateToText(record.date)}.</p>
+                {type === "admin" && (
+                    <div>
+                        <button className="btn btn-danger me-2">Delete</button>
+                        <button className="btn btn-primary">Edit</button>
+                    </div>
+                )}
             </div>
             <hr />
         </div>

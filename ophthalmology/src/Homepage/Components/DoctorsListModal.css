@@ -1,0 +1,55 @@
+/* DoctorsListModal.css */
+.DoctorsListModal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-top: 30px;
+    width: 400px;
+    margin: auto;
+    text-align: center;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .doctor-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  .delete-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: red;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: darkred;
+  }
+  
+  .close-button {
+    margin-top: 20px;
+    border: none;
+    background-color: #007bff;
+    color: rgb(0, 0, 0);
+    border-radius: 5px;
+    cursor: pointer;
+    width: fit-content;
+  }
+  
+  .close-button:hover {
+    background-color: #0056b3;
+  }
+  
